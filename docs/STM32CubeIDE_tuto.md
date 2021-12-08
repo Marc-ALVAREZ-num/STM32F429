@@ -52,13 +52,12 @@ Utilisation STM32CubeMX:
 	- Une fois le code écrit il est nécessaire de le BUILD
 		- Clique droit sur le projet en cours dans la fenetre project explorer
 		- Build project
-	Cette action permet de vérifier toutes erreurs potentielles du code.
-
+		Cette action permet de vérifier toutes erreurs potentielles du code.
 	- Ensuite il faut le RUN ou le DEBUG
 		- Clique droit sur le projet en cours 
 		- Run as / Debug as
 		- STM32 cortex-M C/C++ application
 
-	Le run implémente le code sur la ship alors que le debug implémente et permet d'acceder aux variables créées dans le code afin de vérifier si tout se passe comme prévu.
+Le run implémente le code sur la ship alors que le debug implémente et permet d'acceder aux variables créées dans le code afin de vérifier si tout se passe comme prévu.
 
 
