@@ -1,4 +1,4 @@
-# STM32F429
+# Generic I2C slave using STM32F429
 
 The aim of this project is to create a generic I2C slave with the device STM32F429. I use the board STM32F429-disc1 discovery kit. 
 The IDE used is STM32CubeIDE.
