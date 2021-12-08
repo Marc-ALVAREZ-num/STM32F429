@@ -21,4 +21,4 @@ De même nous utilisons le driver :
 
 ## Setup CubeIDE
 
-Voir tuto [docs/STM32CubeIDE_tuto.md](ici)
+Voir tuto [ici](docs/STM32CubeIDE_tuto.md)
