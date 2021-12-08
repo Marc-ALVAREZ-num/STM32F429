@@ -22,6 +22,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "stm32f4xx_hal_i2c.h"  // possede toutes les fonctions existante en I2C;  pas nécessaire car inclu dans main.h-->stm32f4xx_hal.h-->stm32f4xx_hal_conf.h
+#include"stm32f429xx.h"         // possede tous les parametres de l'appareil;   pas nécesaire inclu dans les autres .h comme précédemment
 
 /* USER CODE END Includes */
 
@@ -32,6 +34,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+//#define MY_I2C_ADDRESS1 I2C_OAR1_ADD1_7       //    0x000000FEU                                  /*!<Interface Address */  // OAR= Own Address Register
+//#define MY_I2C_ADDRESS2 I2C_OAR1_ADD8_9       //    0x00000300U                                  /*!<Interface Address */
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -40,16 +45,19 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-I2C_HandleTypeDef hi2c1;
+I2C_HandleTypeDef hi2c3;
 
 /* USER CODE BEGIN PV */
-
+uint32_t add=0x0000001E;  // definit mon adresse de l'appareil
+uint8_t LEDs=0x03;
+uint8_t *data_receive;
+int switches=1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_I2C1_Init(void);
+static void MX_I2C3_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -87,24 +95,54 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_I2C1_Init();
+  MX_I2C3_Init();
   /* USER CODE BEGIN 2 */
-  HAL_NVIC_EnableIRQ(I2C3_EV_IRQn);  // activer les evenements d'interruption de mon I2C3
-  HAL_NVIC_EnableIRQ(I2C3_ER_IRQn);  // activer les erreurs d'interruptions de mon I2C3
+  hi2c3.Mode=HAL_I2C_MODE_SLAVE;
+  //hi2c3.Devaddress=add;
+  //uint8_t command=0x55; // Je determine un octet qui permettra de commander mon slave, à sa reception le slave doit comprendre qu'il veut allumer les LEDs
 
-  hi2c1.mode=HAL_I2C_MODE_SLAVE;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
+	  if(__HAL_I2C_GET_FLAG(&hi2c3,I2C_FLAG_ADDR))
+	  {
+		  HAL_I2C_Slave_Transmit(/*I2C_HandleTypeDef *hi2c*/&hi2c3, /*uint8_t *pData*/&LEDs, 1, 1000); // j'envoie 0x03
+		  switches=2;
+
+	  }
+	  //HAL_I2C_Slave_Receive(/*I2C_HandleTypeDef *hi2c*/&hi2c3, /*uint8_t *pData*/data_receive, /*uint16_t Size*/1, /*uint32_t Timeout*/1000);
+	  if(switches==1)
+	  {
+		  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+		  HAL_Delay(100);
+	  }
+	  else
+	  {
+		  HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+		  HAL_Delay(100);
+	  }
+
+
+	  //if(*data_receive==command)
+
+	  //{
+		  //HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_SET);
+		  //HAL_I2C_Slave_Transmit(/*I2C_HandleTypeDef *hi2c*/&hi2c3, /*uint8_t *pData*/&LEDs, 1, 1000); // j'envoie 0x03
+		  //HAL_Delay(10000);
+	  //}
+	 // HAL_GPIO_WritePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin, GPIO_PIN_RESET);
+
+
+
     /* USER CODE END WHILE */
-	  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
-	  HAL_Delay(1000);
+
     /* USER CODE BEGIN 3 */
   }
-
   /* USER CODE END 3 */
 }
 
@@ -153,48 +191,49 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief I2C1 Initialization Function
+  * @brief I2C3 Initialization Function
   * @param None
   * @retval None
   */
-static void MX_I2C1_Init(void)
+static void MX_I2C3_Init(void)
 {
 
-  /* USER CODE BEGIN I2C1_Init 0 */
+  /* USER CODE BEGIN I2C3_Init 0 */
 
-  /* USER CODE END I2C1_Init 0 */
+  /* USER CODE END I2C3_Init 0 */
 
-  /* USER CODE BEGIN I2C1_Init 1 */
+  /* USER CODE BEGIN I2C3_Init 1 */
 
-  /* USER CODE END I2C1_Init 1 */
-  hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 100000;
-  hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
-  hi2c1.Init.OwnAddress1 = 0;
-  hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-  hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-  hi2c1.Init.OwnAddress2 = 0;
-  hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-  hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
-  if (HAL_I2C_Init(&hi2c1) != HAL_OK)
+  /* USER CODE END I2C3_Init 1 */
+  hi2c3.Instance = I2C3;
+  hi2c3.Init.ClockSpeed = 100000;
+  hi2c3.Init.DutyCycle = I2C_DUTYCYCLE_2;
+  hi2c3.Init.OwnAddress1 = 0;
+  hi2c3.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+  hi2c3.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+  hi2c3.Init.OwnAddress2 = 0;
+  hi2c3.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+  hi2c3.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+  if (HAL_I2C_Init(&hi2c3) != HAL_OK)
   {
     Error_Handler();
   }
   /** Configure Analogue filter
   */
-  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
+  if (HAL_I2CEx_ConfigAnalogFilter(&hi2c3, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
   {
     Error_Handler();
   }
   /** Configure Digital filter
   */
-  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c3, 0) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN I2C1_Init 2 */
-
-  /* USER CODE END I2C1_Init 2 */
+  /* USER CODE BEGIN I2C3_Init 2 */
+  HAL_NVIC_EnableIRQ(I2C3_EV_IRQn);  // activer les evenements d'interruption de mon I2C3
+  HAL_NVIC_EnableIRQ(I2C3_ER_IRQn);  // activer les erreurs d'interruptions de mon I2C3
+  /* USER CODE END I2C3_Init 2 */
 
 }
 
@@ -208,9 +247,9 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOG, LED_GREEN_Pin|LED_RED_Pin, GPIO_PIN_RESET);
@@ -219,15 +258,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pin = LED_GREEN_Pin|LED_RED_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c){
 
-}
 /* USER CODE END 4 */
 
 /**
