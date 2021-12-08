@@ -19,3 +19,6 @@ De même nous utilisons le driver :
   - STM32F4xx_HAL_Driver
   - CMSIS
 
+## Setup CubeIDE
+
+Voir tuto [docs/STM32CubeIDE_tuto.md](ici)
