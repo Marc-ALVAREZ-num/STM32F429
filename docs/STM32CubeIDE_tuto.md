@@ -49,7 +49,7 @@ Utilisation STM32CubeMX:
 
 
 ** Lancer le projet:
-	 - Une fois le code écrit il est nécessaire de le BUILD
+	- Une fois le code écrit il est nécessaire de le BUILD
 		- Clique droit sur le projet en cours dans la fenetre project explorer
 		- Build project
 	Cette action permet de vérifier toutes erreurs potentielles du code.
